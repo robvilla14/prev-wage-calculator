@@ -1,0 +1,1059 @@
+<!--
+===============================================================================
+                        WAGE DETERMINATION CALCULATOR v10.9
+                     Federal and State Construction Projects
+===============================================================================
+
+DESCRIPTION:
+    Web-based calculator for determining applicable wage determination 
+    dates for federal and California state public works projects. Designed 
+    to assist in prevailing wage compliance by calculating effective dates 
+    based on bid opening and first advertisement dates.
+
+AUTHOR:         Robert Villa
+PROJECT:        Labor Compliance Construction Solutions
+VERSION:        10.9
+LAST UPDATED:   July 2025
+PLATFORM:       HTML5 / CSS3 / JavaScript
+
+===============================================================================
+FEATURES:
+- Federal wage determination: 10 calendar days prior to bid opening
+- California state wage determination: based on 02/22 and 08/22 schedules
+- Project info tracking (Name, Number, Bid Number)
+- Export to PDF for documentation
+- Resource library with federal and state compliance links
+- Mobile-responsive layout
+- Native and manual date entry support
+- Real-time logic and validation
+- Daylight saving time (DST)-aware calculations
+- Clean grid layout with adaptive sizing
+===============================================================================
+-->
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<!-- Favicon for most browsers -->
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<!-- PNG favicon for specific sizes -->
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<!-- Apple iOS icon -->
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<!-- Android/Chrome web app icons -->
+<link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
+<!-- Web manifest for PWA support -->
+<link rel="manifest" href="site.webmanifest">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta name="description" content="Federal and California state wage determination calculator for construction projects. Calculate prevailing wage dates for Davis-Bacon Act compliance and state requirements.">
+<meta name="keywords" content="wage determination, prevailing wage, Davis-Bacon Act, construction, federal, California, labor compliance, bid opening, advertisement date">
+<meta name="author" content="Robert Villa - Labor Compliance Construction Solutions">
+<meta property="og:title" content="Wage Determination Calculator">
+<meta property="og:description" content="Professional calculator for determining appropriate wage determination dates for federal and state construction projects.">
+<meta property="og:type" content="website">
+<meta name="robots" content="index, follow">
+<title>Wage Determination Calculator</title>
+<style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f9fa;
+      line-height: 1.6;
+    }
+    
+    /* Header Styles */
+    .site-header {
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      color: white;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .header-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    @media (min-width: 768px) {
+      .header-top {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+    .site-title {
+      color: white;
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+    @media (min-width: 768px) {
+      .site-title {
+        font-size: 2.2rem;
+      }
+    }
+    .header-meta {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    .divider {
+      opacity: 0.6;
+    }
+    .header-info {
+      display: grid;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    @media (min-width: 768px) {
+      .header-info {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+    }
+    .header-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 1rem;
+    }
+    .header-nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+      font-weight: 500;
+    }
+    .header-nav a:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+    
+    /* Main Content */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    @media (min-width: 768px) {
+      .main-content {
+        padding: 0 2rem;
+      }
+    }
+    
+    /* Grid Layout for Calculator Sections */
+    .calculator-grid {
+      display: grid;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    @media (min-width: 968px) {
+      .calculator-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+    }
+    h2 {
+      color: #333;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 5px;
+    }
+    .intro {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1em;
+      border-radius: 8px;
+      margin-bottom: 1.5em;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    @media (min-width: 768px) {
+      .intro {
+        padding: 1.5em;
+        margin-bottom: 2em;
+      }
+    }
+    .intro h3 {
+      margin-top: 0;
+      color: #fff;
+    }
+    .intro p {
+      margin-bottom: 0.5em;
+      line-height: 1.6;
+    }
+    .section {
+      margin-bottom: 1.5rem;
+      padding: 1.5rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      height: fit-content;
+    }
+    .section h2 {
+      margin-top: 0;
+      color: #333;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 5px;
+    }
+    .section h3 {
+      color: #2c3e50;
+      margin-top: 0;
+      margin-bottom: 1em;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5em;
+    }
+    .section a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .section a:hover {
+      color: #2980b9;
+      text-decoration: underline;
+    }
+    label {
+      display: block;
+      margin-top: 1em;
+      font-weight: 500;
+    }
+    input[type="date"], input[type="text"] {
+      width: 100%;
+      max-width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
+    }
+    @media (min-width: 768px) {
+      input[type="date"], input[type="text"] {
+        padding: 0.6rem;
+        margin-top: 0.3rem;
+        font-size: 14px;
+      }
+    }
+    input[readonly] {
+      background-color: #f8f9fa;
+      color: #495057;
+    }
+    .input-hint {
+      font-size: 0.8em;
+      color: #666;
+      font-style: italic;
+      margin-top: 0.3em;
+      font-weight: normal;
+    }
+    .clear-button {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 2em auto;
+      display: block;
+      transition: background-color 0.3s ease;
+      width: 100%;
+      max-width: 200px;
+    }
+    @media (min-width: 768px) {
+      .clear-button {
+        padding: 12px 24px;
+        width: auto;
+      }
+    }
+    .clear-button:hover {
+      background: #c0392b;
+    }
+    .clear-button:active {
+      transform: translateY(1px);
+    }
+    
+    /* Resources Section */
+    .resources-section {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 3px solid #3498db;
+    }
+    .resources-section h2 {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      font-weight: bold;
+    }
+    .resources-grid {
+      display: grid;
+      gap: 2rem;
+    }
+    @media (min-width: 768px) {
+      .resources-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .resource-box {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      border-left: 5px solid #3498db;
+    }
+    .resource-box h3 {
+      color: #2c3e50;
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+      text-align: center;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .resource-item {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 6px;
+      border-left: 3px solid #3498db;
+    }
+    .resource-item:last-child {
+      margin-bottom: 0;
+    }
+    .resource-item strong {
+      color: #2c3e50;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .resource-item a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .resource-item a:hover {
+      color: #2980b9;
+      text-decoration: underline;
+    }
+    
+    /* Project Information Section */
+    .project-info-section {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-left: 4px solid #27ae60;
+    }
+    .project-info-section h3 {
+      color: #2c3e50;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .project-fields-grid {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .project-fields-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+    }
+    
+    /* Export/Print Buttons */
+    .export-buttons {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .export-buttons {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        align-items: center;
+      }
+      .export-btn:nth-child(1) { grid-column: 1; grid-row: 1; }
+      .print-btn:nth-child(2) { grid-column: 2; grid-row: 1; }
+      .clear-button:nth-child(3) {
+        grid-column: 1 / span 2;
+        grid-row: 2;
+        justify-self: center;
+        width: 50%;
+        min-width: 180px;
+        margin: 0 auto;
+      }
+    }
+    .export-btn {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-weight: 500;
+      width: 100%;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .export-btn:hover {
+      background: #219a52;
+    }
+    .export-btn:active {
+      transform: translateY(1px);
+    }
+    .print-btn {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-weight: 500;
+      width: 100%;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .print-btn:hover {
+      background: #2980b9;
+    }
+    .print-btn:active {
+      transform: translateY(1px);
+    }
+    
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .site-header {
+        background: #2c3e50 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .clear-button, .export-buttons, .resources-section {
+        display: none !important;
+      }
+      .section, .project-info-section {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+      }
+      .intro {
+        background: #667eea !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+	  #printSummary { display: none; }
+
+#printSummary h1 {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+#printSummary p {
+  margin: 0.3rem 0;
+  font-size: 1rem;
+}
+
+#printSummary table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+#printSummary th, #printSummary td {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+#printSummary th {
+  background-color: #f0f0f0;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printSummary, #printSummary * {
+    visibility: visible;
+  }
+  #printSummary { display: none; }
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.footer-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+@media (min-width: 768px) {
+  .footer-content {
+    padding: 0 2rem;
+  }
+}
+
+/* Footer Styles */
+.site-footer {
+  background-color: #2c3e50;
+  color: white;
+  text-align: center;
+  padding: 2rem 0;
+  margin-top: 3rem;
+}
+
+/* FAQ Section */
+.section.faq-section {
+  margin-bottom: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 0;
+  overflow: hidden;
+}
+.faq-header {
+  background: #444;
+  color: #2c3e50;
+  padding: 18px 24px;
+  width: 100%;
+  font-size: 1.3rem;
+  font-weight: bold;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+.faq-header:hover, .faq-header.active {
+  background: #333;
+}
+.faq-indicator {
+  font-size: 1.5em;
+  margin-left: 1em;
+  transition: transform 0.2s;
+}
+.faq-content {
+  background: #f8f9fa;
+  padding: 2rem;
+  display: none;
+  border-radius: 0 0 8px 8px;
+}
+.faq-content.open {
+  display: block;
+}
+.faq-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin: 0;
+}
+@media (min-width: 768px) {
+  .faq-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+    }
+  </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script></head>
+<body>
+<header class="site-header">
+<div class="header-content">
+<div class="header-top">
+<h1 class="site-title">Wage Determination Calculator</h1>
+<div class="header-meta">
+<span class="version">Version 10.9</span>
+<span class="divider">|</span>
+<span class="updated">Updated: July 2025</span>
+</div>
+</div>
+</div>
+</header>
+<main class="main-content">
+<div class="intro">
+<h3>About This Calculator</h3>
+<p>This calculator helps determine the appropriate wage determination dates for federal and state construction projects. Understanding these dates is crucial for compliance with prevailing wage requirements.</p>
+<p><strong>Federal Wage Determination:</strong> Based on the bid opening date, this calculates the wage determination that was in effect 10 days prior to bid opening.</p>
+<p><strong>State Wage Determination:</strong> Based on the advertisement/solicitation date, this determines which state wage determination period applies, following the biannual schedule (February 22 and August 22 effective dates).</p>
+</div>
+<div class="section">
+<h3>Federal Wage Determinations</h3>
+<p>Federal wage determinations establish the minimum wages, fringe benefits, and work conditions that must be paid to workers on federally funded projects. These rates are set by the U.S. Department of Labor based on the prevailing wages for specific labor classifications in defined geographic areas.</p>
+<p><strong>Resource:</strong> <a href="https://sam.gov/wage-determinations" rel="noopener noreferrer" target="_blank">Federal Wage Determinations (SAM.gov)</a></p>
+</div>
+<div class="section">
+<h3>California State Wage Determinations</h3>
+<p>For California public works projects, workers must be paid the prevailing wage as determined by the Department of Industrial Relations (DIR). These rates vary by craft, classification, and project location and are typically aligned with collective bargaining agreements.</p>
+<p><strong>Resource:</strong> <a href="https://dir.ca.gov/OPRL/DPreWageDetermination.htm" rel="noopener noreferrer" target="_blank">State Wage Determinations (DIR.ca.gov)</a></p>
+</div>
+<h2>Federal Wage Determination</h2>
+<div class="section">
+<label>Bid Opening Date:
+      <input id="federalBidDate" onchange="calculateFederalDate()" type="date"/>
+<div class="input-hint">Select a date using the date picker or type manually</div>
+</label>
+<label>Federal Wage Determination Date:
+      <input id="federalDeterminationDate" readonly="" type="text"/>
+</label>
+</div>
+<h2>State Wage Determination</h2>
+<div class="section">
+<label>Advertisement/Solicitation Date:
+      <input id="stateAdDate" onchange="calculateStateDetermination()" type="date"/>
+<div class="input-hint">Select a date using the date picker or type manually</div>
+</label>
+<label>State Wage Determination Date:
+      <input id="stateDeterminationDate" readonly="" type="text"/>
+</label>
+<label>State Wage Determination:
+      <input id="stateDeterminationLabel" readonly="" type="text"/>
+</label>
+</div>
+<button class="clear-button" onclick="clearAllFields()">Clear All Fields</button>
+<div class="project-info-section">
+<h3>Project Information</h3>
+<div class="project-fields-grid">
+<label>Awarding Agency:
+        <input id="awardingAgency" placeholder="e.g., City of <city name>" type="text"/>
+</label>
+<label>Project Name:
+        <input id="projectName" placeholder="Enter project name" type="text"/>
+</label>
+<label>Project Number:
+        <input id="projectNumber" placeholder="Enter project number" type="text"/>
+</label>
+<label>Bid Number:
+        <input id="bidNumber" placeholder="Enter bid number" type="text"/>
+</label>
+</div>
+<div class="export-buttons">
+  <button class="export-btn" onclick="copyToClipboard()">📋 Copy Results</button>
+  <button class="print-btn" onclick="generatePDFReport()">📄 Generate PDF Report</button>
+  <button class="clear-button" onclick="clearProjectInfo()">🧹 Clear Project Info</button></div>
+</div>
+<!-- FAQ Section -->
+<div class="section faq-section">
+  <h3 class="faq-header" tabindex="0" onclick="toggleFAQ(this)" aria-expanded="false" aria-controls="faq-content">
+    <span>FAQs</span>
+    <span class="faq-indicator">+</span>
+  </h3>
+  <div id="faq-content" class="faq-content" style="display: none;">
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h4>What Are Prevailing Wages?</h4>
+        <p>Prevailing wages refer to the minimum hourly wages, including fringe benefits, that contractors and subcontractors must pay to workers on federally funded or state-funded public works projects. These wages are determined by government agencies, often based on local wage rates for similar work in a given region.</p>
+      </div>
+      <div class="faq-item">
+        <h4>What is the Davis-Bacon Act?</h4>
+        <p>A federal law enacted in 1931, established prevailing wage requirements for federal construction projects. Many states have their own prevailing wage laws—commonly known as Little Davis-Bacon Acts—that apply similar standards to state and local projects.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Why Are Prevailing Wages Important?</h4>
+        <ul>
+          <li><strong>Protects Workers</strong> – Ensures fair pay and benefits, preventing underpayment and exploitation.</li>
+          <li><strong>Promotes Skilled Labor</strong> – Encourages a high-quality workforce by ensuring competitive wages.</li>
+          <li><strong>Prevents Unfair Competition</strong> – Levels the playing field by preventing bids based solely on low labor costs.</li>
+          <li><strong>Boosts Local Economies</strong> – Higher wages increase consumer spending and economic stability in local communities.</li>
+          <li><strong>Ensures Compliance</strong> – Contractors who fail to follow prevailing wage laws may face penalties, legal action, or contract termination.</li>
+        </ul>
+      </div>
+
+      <div class="faq-item">
+        <h4>What date locks in the federal wage determination?</h4>
+        <p>The federal wage determination in effect 10 calendar days before the Bid Opening Date.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>What date locks in the California state wage determination?</h4>
+        <p>The determination in effect on the project's First Advertisement Date.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>When do California state wage determinations take effect?</h4>
+        <p>New determinations are issued on Feb 22 and Aug 22, effective 10 calendar days later.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>What if the Ad Date is before March 3?</h4>
+        <p>Use the previous August 22 determination (since Feb 22 has not taken effect yet).</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>Do weekends or leap years affect the 10-day rule?</h4>
+        <p>No. It uses calendar days, not business days.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>Is the pre-bid meeting date used for wage lock-in?</h4>
+        <p>No. Use Bid Opening Date for federal and Ad Date for state wage determinations.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="resources-section">
+  <h2 class="resources-title">Helpful Resources</h2>
+<div class="resources-grid">
+<div class="resource-box">
+  <h3>Federal and State Guidelines</h3>
+<div class="resource-item">
+  <strong>Local Assistance Procedures Manual – Exhibit 12-G</strong>
+  <a href="https://dot.ca.gov/-/media/dot-media/programs/local-assistance/documents/lapm/c12/12g.pdf" target="_blank">View PDF</a>
+</div>
+<div class="resource-item">
+  <strong>Caltrans Labor Compliance</strong>
+  <a href="https://dot.ca.gov/programs/construction/labor-compliance" target="_blank">dot.ca.gov</a>
+</div>
+<div class="resource-item">
+  <strong>Caltrans LAPM</strong>
+  <a href="https://dot.ca.gov/programs/local-assistance/guidelines-and-procedures/local-assistance-procedures-manual-lapm" target="_blank">View Manual</a>
+</div>
+</div>
+<div class="resource-box">
+  <h3>Compliance Agencies &amp; Checklists</h3>
+<div class="resource-item">
+  <strong>U.S. Department of Labor</strong>
+  <a href="https://www.dol.gov/agencies/whd/compliance-assistance" target="_blank">dol.gov</a>
+</div>
+<div class="resource-item">
+  <strong>LCP Enforcement Forms &amp; Resources</strong>
+  <a href="https://www.dir.ca.gov/lcp/LCPEnforcementFormsResources.htm" target="_blank">dir.ca.gov</a>
+</div>
+<div class="resource-item">
+  <strong>Caltrans Pre-Job Checklist (LCPtracker)</strong>
+  <a href="https://dot.ca.gov/-/media/dot-media/programs/construction/documents/labor-compliance/prejob-checklists/2024-05-checklists/2024-05-state-lcptracker-contract_a11y.pdf" target="_blank">View Checklist</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-content">
+    <p>&copy; 2025 Construction Compliance Solutions | LC Wage Determination Calculator v10.9</p>
+    
+    <p style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.8;">
+      Disclaimer: This information is for general reference only and may not reflect current regulations.
+      Users are responsible for verifying all data with official sources. No liability is assumed for decisions
+      made using this tool.
+    </p>
+
+    <p style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.8;">
+      Licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a>.
+      View on <a href="https://github.com/your-username/your-repo" target="_blank">GitHub</a>.
+    </p>
+  </div>
+</footer>
+
+<script>
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function calculateFederalDate() {
+  const input = document.getElementById('federalBidDate').value;
+  if (!input) {
+    document.getElementById('federalDeterminationDate').value = '';
+    return;
+  }
+  const [year, month, day] = input.split('-').map(Number);
+  const bidDate = new Date(year, month - 1, day);
+  if (isNaN(bidDate.getTime())) {
+    document.getElementById('federalDeterminationDate').value = 'Invalid date';
+    return;
+  }
+  bidDate.setDate(bidDate.getDate() - 10);  // FIXED: minus 10 days
+  document.getElementById('federalDeterminationDate').value = formatDate(bidDate);
+}
+
+function calculateStateDetermination() {
+  const input = document.getElementById('stateAdDate').value;
+  if (!input) {
+    document.getElementById('stateDeterminationDate').value = '';
+    document.getElementById('stateDeterminationLabel').value = '';
+    return;
+  }
+  const [year, month, day] = input.split('-').map(Number);
+  const adDate = new Date(year, month - 1, day);
+  if (isNaN(adDate.getTime())) {
+    document.getElementById('stateDeterminationDate').value = 'Invalid date';
+    document.getElementById('stateDeterminationLabel').value = '';
+    return;
+  }
+  const mar3 = new Date(year, 2, 3);
+  const sep1 = new Date(year, 8, 1);
+  let swdDate, swdLabel;
+  if (adDate < mar3) {
+    swdDate = new Date(year - 1, 7, 22);
+    swdLabel = (year - 1) + "-2";
+  } else if (adDate < sep1) {
+    swdDate = new Date(year, 1, 22);
+    swdLabel = year + "-1";
+  } else {
+    swdDate = new Date(year, 7, 22);
+    swdLabel = year + "-2";
+  }
+  document.getElementById('stateDeterminationDate').value = formatDate(swdDate);
+  document.getElementById('stateDeterminationLabel').value = swdLabel;
+}
+
+function clearAllFields() {
+  document.getElementById('federalBidDate').value = '';
+  document.getElementById('federalDeterminationDate').value = '';
+  document.getElementById('stateAdDate').value = '';
+  document.getElementById('stateDeterminationDate').value = '';
+  document.getElementById('stateDeterminationLabel').value = '';
+}
+
+function clearProjectInfo() {
+  document.getElementById('awardingAgency').value = '';
+  document.getElementById('projectName').value = '';
+  document.getElementById('projectNumber').value = '';
+  document.getElementById('bidNumber').value = '';
+}
+
+function copyToClipboard() {
+  const awardingAgency = document.getElementById('awardingAgency').value || 'Not provided';
+  const projectName = document.getElementById('projectName').value || 'Not provided';
+  const projectNumber = document.getElementById('projectNumber').value || 'Not provided';
+  const bidNumber = document.getElementById('bidNumber').value || 'Not provided';
+  const fedBid = document.getElementById('federalBidDate').value || 'Not provided';
+  const fedDet = document.getElementById('federalDeterminationDate').value || 'Not calculated';
+  const stateAd = document.getElementById('stateAdDate').value || 'Not provided';
+  const stateDet = document.getElementById('stateDeterminationDate').value || 'Not calculated';
+  const stateLbl = document.getElementById('stateDeterminationLabel').value || 'Not calculated';
+  
+  const text = `WAGE DETERMINATION RESULTS
+
+Awarding Agency: ${awardingAgency}
+Project: ${projectName}
+Project Number: ${projectNumber}
+Bid Number: ${bidNumber}
+
+Federal Bid Date: ${fedBid}
+Federal Determination Date: ${fedDet}
+
+State Ad Date: ${stateAd}
+State Determination Date: ${stateDet}
+State Determination Label: ${stateLbl}
+
+Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
+LC Wage Determination Calculator v10.9`;
+
+  // Get the button directly
+  const btn = document.querySelector('.export-btn');
+  const originalText = btn.innerHTML;
+
+  // Try modern clipboard API first
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.innerHTML = '✅ Copied!';
+      setTimeout(() => btn.innerHTML = originalText, 2000);
+    }).catch(() => {
+      fallbackCopyTextToClipboard(text, btn, originalText);
+    });
+  } else {
+    // Use fallback method
+    fallbackCopyTextToClipboard(text, btn, originalText);
+  }
+}
+
+function toggleFAQ(header) {
+  const content = header.nextElementSibling;
+  const indicator = header.querySelector('.faq-indicator');
+  const expanded = header.getAttribute('aria-expanded') === 'true';
+  if (!expanded) {
+    content.classList.add('open');
+    content.style.display = 'block';
+    header.classList.add('active');
+    header.setAttribute('aria-expanded', 'true');
+    indicator.textContent = '−';
+  } else {
+    content.classList.remove('open');
+    content.style.display = 'none';
+    header.classList.remove('active');
+    header.setAttribute('aria-expanded', 'false');
+    indicator.textContent = '+';
+  }
+}
+</script>
+</main>
+<script>
+async function generatePDFReport() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // Get form data
+  const awardingAgency = document.getElementById('awardingAgency').value || 'Not Provided';
+  const projectName = document.getElementById('projectName').value || 'Not Provided';
+  const projectNumber = document.getElementById('projectNumber').value || 'Not Provided';
+  const bidNumber = document.getElementById('bidNumber').value || 'Not Provided';
+  const fedBid = document.getElementById('federalBidDate').value || 'Not Provided';
+  const fedDet = document.getElementById('federalDeterminationDate').value || 'Not Calculated';
+  const stateAd = document.getElementById('stateAdDate').value || 'Not Provided';
+  const stateDet = document.getElementById('stateDeterminationDate').value || 'Not Calculated';
+  const stateLbl = document.getElementById('stateDeterminationLabel').value || 'Not Calculated';
+
+  let y = 20;
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  // Awarding Agency - Large, Bold, Centered
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text(awardingAgency, pageWidth/2, y, { align: 'center' });
+  y += 12;
+
+  // Project Name - Large, Bold, Centered
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text(projectName, pageWidth/2, y, { align: 'center' });
+  y += 6;
+
+  // Project Number - Medium, Bold, Centered  
+  doc.setFontSize(12);
+  doc.text(`Project Number: ${projectNumber}`, pageWidth/2, y, { align: 'center' });
+  y += 6;
+
+  // Bid Number - Medium, Bold, Centered
+  doc.text(`Bid Number: ${bidNumber}`, pageWidth/2, y, { align: 'center' });
+  y += 20;
+
+  // Federal Wage Determination Table
+  doc.setFontSize(14);
+  doc.setFont(undefined, 'bold');
+  doc.text('Federal Wage Determination', 10, y);
+  y += 10;
+
+  doc.autoTable({
+    startY: y,
+    body: [
+      ['Bid Opening Date', fedBid],
+      ['Federal Determination Date', fedDet]
+    ],
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219], textColor: 255, fontStyle: 'bold' },
+    styles: { fontSize: 10, cellPadding: 5 },
+    columnStyles: { 0: { fontStyle: 'bold', cellWidth: 70 }, 1: { cellWidth: 110 } }
+  });
+
+  y = doc.lastAutoTable.finalY + 15;
+
+  // State Wage Determination Table
+  doc.setFontSize(14);
+  doc.setFont(undefined, 'bold');
+  doc.text('State Wage Determination', 10, y);
+  y += 10;
+
+  doc.autoTable({
+    startY: y,
+    body: [
+      ['Advertisement/Solicitation Date', stateAd],
+      ['State Determination Date', stateDet],
+      ['State Determination Label', stateLbl]
+    ],
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219], textColor: 255, fontStyle: 'bold' },
+    styles: { fontSize: 10, cellPadding: 5 },
+    columnStyles: { 0: { fontStyle: 'bold', cellWidth: 70 }, 1: { cellWidth: 110 } }
+  });
+
+  y = doc.lastAutoTable.finalY + 15;
+
+  // Calculation Methodology
+  doc.setFontSize(14);
+  doc.setFont(undefined, 'bold');
+  doc.text('Calculation Methodology', 10, y);
+  y += 15;
+
+  // Federal Section
+  doc.setFontSize(12);
+  doc.setFont(undefined, 'bold');
+  doc.text('Federal Wage Determination', 10, y);
+  y += 8;
+
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'normal');
+  doc.text('The applicable federal wage determination is the one in effect 10 calendar days', 10, y);
+  y += 5;
+  doc.text('prior to the Bid Opening Date.', 10, y);
+  y += 15;
+
+  // State Section  
+  doc.setFontSize(12);
+  doc.setFont(undefined, 'bold');
+  doc.text('California State Wage Determination', 10, y);
+  y += 8;
+
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'normal');
+  doc.text('The applicable state wage determination is the one in effect on the First', 10, y);
+  y += 5;
+  doc.text('Advertisement Date. California issues new determinations twice per year:', 10, y);
+  y += 8;
+
+  doc.text('• February 22 + 10 calendar days later', 15, y);
+  y += 5;
+  doc.text('• August 22 + 10 calendar days later', 15, y);
+  y += 8;
+
+  doc.text('The First Advertisement Date determines which wage determination is in', 10, y);
+  y += 5;
+  doc.text('effect at the time of publication.', 10, y);
+  y += 10;
+
+  // Footer
+  y += 10;  // Add some extra space
+  doc.setFontSize(8);
+  doc.setFont(undefined, 'normal');
+
+  doc.text(`Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 10, y);
+  doc.text('LC Wage Determination Calculator v10.9 | Labor Compliance Solutions | Licensed under the MIT License | https://github.com/robvilla14/prev-wage-calculator', 10, y + 5);
+
+  doc.save("Labor_Compliance_Wage_Determination_Report.pdf");
+}
+</script>
+</body>
+</html>
