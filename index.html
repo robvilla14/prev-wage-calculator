@@ -1,6 +1,6 @@
 <!--
 ===============================================================================
-                        WAGE DETERMINATION CALCULATOR v10.9
+                        WAGE DETERMINATION CALCULATOR v11.0
                      Federal and State Construction Projects
 ===============================================================================
 
@@ -12,7 +12,7 @@ DESCRIPTION:
 
 AUTHOR:         Robert Villa
 PROJECT:        Labor Compliance Construction Solutions
-VERSION:        10.9
+VERSION:        11.0
 LAST UPDATED:   July 2025
 PLATFORM:       HTML5 / CSS3 / JavaScript
 
@@ -604,7 +604,7 @@ FEATURES:
 <div class="header-top">
 <h1 class="site-title">Wage Determination Calculator</h1>
 <div class="header-meta">
-<span class="version">Version 10.9</span>
+<span class="version">Version 11.0</span>
 <span class="divider">|</span>
 <span class="updated">Updated: July 2025</span>
 </div>
@@ -615,8 +615,8 @@ FEATURES:
 <div class="intro">
 <h3>About This Calculator</h3>
 <p>This calculator helps determine the appropriate wage determination dates for federal and state construction projects. Understanding these dates is crucial for compliance with prevailing wage requirements.</p>
-<p><strong>Federal Wage Determination:</strong> Based on the bid opening date, this calculates the wage determination that was in effect 10 days prior to bid opening.</p>
-<p><strong>State Wage Determination:</strong> Based on the advertisement/solicitation date, this determines which state wage determination period applies, following the biannual schedule (February 22 and August 22 effective dates).</p>
+<p><strong>Federally Funded Projects:</strong> Use the Bid Opening Date for BOTH federal (Davis-Bacon) and state (DIR) wage determinations - both must be in effect 10 days prior to bid opening.</p>
+<p><strong>State-Only Projects:</strong> Use the Advertisement/Solicitation Date for state wage determination, following the biannual schedule (February 22 and August 22 effective dates).</p>
 </div>
 <div class="section">
 <h3>Federal Wage Determinations</h3>
@@ -770,7 +770,7 @@ FEATURES:
 <!-- Footer -->
 <footer class="site-footer">
   <div class="footer-content">
-    <p>&copy; 2025 Construction Compliance Solutions | LC Wage Determination Calculator v10.9</p>
+    <p>&copy; 2025 Construction Compliance Solutions | LC Wage Determination Calculator v11.0</p>
     
     <p style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.8;">
       Disclaimer: This information is for general reference only and may not reflect current regulations.
@@ -856,20 +856,20 @@ function clearProjectInfo() {
 }
 
 function copyToClipboard() {
-  const awardingAgency = document.getElementById('awardingAgency').value || 'Not provided';
-  const projectName = document.getElementById('projectName').value || 'Not provided';
-  const projectNumber = document.getElementById('projectNumber').value || 'Not provided';
-  const bidNumber = document.getElementById('bidNumber').value || 'Not provided';
-  const fedBid = document.getElementById('federalBidDate').value || 'Not provided';
-  const fedDet = document.getElementById('federalDeterminationDate').value || 'Not calculated';
-  const stateAd = document.getElementById('stateAdDate').value || 'Not provided';
-  const stateDet = document.getElementById('stateDeterminationDate').value || 'Not calculated';
-  const stateLbl = document.getElementById('stateDeterminationLabel').value || 'Not calculated';
+  const awardingAgency = document.getElementById('awardingAgency').value || '';
+  const projectName = document.getElementById('projectName').value || '';
+  const projectNumber = document.getElementById('projectNumber').value || '';
+  const bidNumber = document.getElementById('bidNumber').value || '';
+  const fedBid = document.getElementById('federalBidDate').value || '';
+  const fedDet = document.getElementById('federalDeterminationDate').value || '';
+  const stateAd = document.getElementById('stateAdDate').value || '';
+  const stateDet = document.getElementById('stateDeterminationDate').value || '';
+  const stateLbl = document.getElementById('stateDeterminationLabel').value || '';
   
   const text = `WAGE DETERMINATION RESULTS
 
 Awarding Agency: ${awardingAgency}
-Project: ${projectName}
+Project: ${projectName}  
 Project Number: ${projectNumber}
 Bid Number: ${bidNumber}
 
@@ -881,7 +881,7 @@ State Determination Date: ${stateDet}
 State Determination Label: ${stateLbl}
 
 Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
-LC Wage Determination Calculator v10.9`;
+LC Wage Determination Calculator v11.0`;
 
   // Get the button directly
   const btn = document.querySelector('.export-btn');
@@ -927,15 +927,15 @@ async function generatePDFReport() {
   const doc = new jsPDF();
 
   // Get form data
-  const awardingAgency = document.getElementById('awardingAgency').value || 'Not Provided';
-  const projectName = document.getElementById('projectName').value || 'Not Provided';
-  const projectNumber = document.getElementById('projectNumber').value || 'Not Provided';
-  const bidNumber = document.getElementById('bidNumber').value || 'Not Provided';
-  const fedBid = document.getElementById('federalBidDate').value || 'Not Provided';
-  const fedDet = document.getElementById('federalDeterminationDate').value || 'Not Calculated';
-  const stateAd = document.getElementById('stateAdDate').value || 'Not Provided';
-  const stateDet = document.getElementById('stateDeterminationDate').value || 'Not Calculated';
-  const stateLbl = document.getElementById('stateDeterminationLabel').value || 'Not Calculated';
+  const awardingAgency = document.getElementById('awardingAgency').value || '';
+  const projectName = document.getElementById('projectName').value || '';
+  const projectNumber = document.getElementById('projectNumber').value || '';
+  const bidNumber = document.getElementById('bidNumber').value || '';
+  const fedBid = document.getElementById('federalBidDate').value || '';
+  const fedDet = document.getElementById('federalDeterminationDate').value || '';
+  const stateAd = document.getElementById('stateAdDate').value || '';
+  const stateDet = document.getElementById('stateDeterminationDate').value || '';
+  const stateLbl = document.getElementById('stateDeterminationLabel').value || '';
 
   let y = 20;
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -1050,7 +1050,7 @@ async function generatePDFReport() {
   doc.setFont(undefined, 'normal');
 
   doc.text(`Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 10, y);
-  doc.text('LC Wage Determination Calculator v10.9 | Labor Compliance Solutions | Licensed under the MIT License | https://github.com/robvilla14/prev-wage-calculator', 10, y + 5);
+  doc.text('LC Wage Determination Calculator v11.0 | Labor Compliance Solutions | Licensed under the MIT License | github.com/your-username/your-repo', 10, y + 5);
 
   doc.save("Labor_Compliance_Wage_Determination_Report.pdf");
 }
