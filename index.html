@@ -1129,7 +1129,7 @@ async function generatePDFReport() {
   doc.setFont(undefined, 'normal');
 
   doc.text(`Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 10, y);
-  doc.text('LC Wage Determination Calculator v11.1 | Labor Compliance Solutions | Licensed under the MIT License | github.com/your-username/your-repo', 10, y + 5);
+  doc.text('LC Wage Determination Calculator v11.1 | Labor Compliance Solutions | Licensed under the MIT License | https://github.com/robvilla14/prev-wage-calculator', 10, y + 5);
 
   doc.save("Labor_Compliance_Wage_Determination_Report.pdf");
 }
